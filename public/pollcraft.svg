@@ -1,24 +1,29 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 40 512 512">
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 128 128">
   <defs>
-    <!-- Gradient: purple → teal -->
-    <linearGradient id="pc-grad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#6A5AE0"/>
-      <stop offset="1" stop-color="#20C997"/>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6A5AE0" />
+      <stop offset="1" stop-color="#20C997" />
     </linearGradient>
+    <path
+      id="bubble"
+      d="M20 12h68a16 16 0 0 1 16 16v44a16 16 0 0 1-16 16H63l-14.8 13.5a6.5 6.5 0 0 1-10.9-5V88H20A16 16 0 0 1 4 72V28A16 16 0 0 1 20 12Z"
+    />
   </defs>
-
-  <!-- Background -->
-  <rect width="512" height="512" fill="#0B1220"/>
-
-  <!-- Chat bubble outline -->
-  <path d="M128 128h256c22 0 40 18 40 40v176c0 22-18 40-40 40h-136l-50 46c-7 6-18 1-18-8v-38h-52c-22 0-40-18-40-40V168c0-22 18-40 40-40Z"
-        fill="none" stroke="url(#pc-grad)" stroke-width="20" stroke-linejoin="round"/>
-
-  <!-- Poll bars -->
-  <rect x="164" y="220" width="28" height="80" rx="6" fill="url(#pc-grad)"/>
-  <rect x="208" y="200" width="28" height="100" rx="6" fill="url(#pc-grad)"/>
-  <rect x="252" y="236" width="28" height="64" rx="6" fill="url(#pc-grad)"/>
-
-  <!-- Checkmark -->
-  <path d="M300 260l28 28 64-68" fill="none" stroke="#20C997" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+  <g transform="translate(10 7)">
+    <use href="#bubble" fill="none" stroke="url(#g)" stroke-width="5" />
+    <g transform="translate(28 32)">
+      <rect x="4" y="26" width="10" height="26" rx="3" fill="url(#g)" />
+      <rect x="20" y="14" width="10" height="38" rx="3" fill="url(#g)" />
+      <rect x="36" y="32" width="10" height="20" rx="3" fill="url(#g)" />
+    </g>
+    <path
+      d="M64 74l8 8 19-20"
+      fill="none"
+      stroke="#20C997"
+      stroke-width="6"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <use href="#bubble" fill="none" stroke="#ffffff" opacity="0.06" />
+  </g>
 </svg>

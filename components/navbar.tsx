@@ -42,7 +42,7 @@ export function Navbar({ initialSession }: NavbarProps) {
               className="flex gap-2 items-center text-lg font-semibold uppercase tracking-[0.369em] text-white drop-shadow-[0_2px_12px_rgba(56,189,248,0.4)]"
             >
 
-              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="-10 -6 128 128">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 128 128">
                 <defs>
                   <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
                     <stop offset="0" stopColor="#6A5AE0" />
@@ -50,14 +50,16 @@ export function Navbar({ initialSession }: NavbarProps) {
                   </linearGradient>
                   <path id="bubble" d="M20 12h68a16 16 0 0 1 16 16v44a16 16 0 0 1-16 16H63l-14.8 13.5a6.5 6.5 0 0 1-10.9-5V88H20A16 16 0 0 1 4 72V28A16 16 0 0 1 20 12Z" />
                 </defs>
-                <use href="#bubble" fill="none" stroke="url(#g)" strokeWidth="5" />
-                <g transform="translate(28,32)">
-                  <rect x="4" y="26" width="10" height="26" rx="3" fill="url(#g)" />
-                  <rect x="20" y="14" width="10" height="38" rx="3" fill="url(#g)" />
-                  <rect x="36" y="32" width="10" height="20" rx="3" fill="url(#g)" />
+                <g transform="translate(10 7)">
+                  <use href="#bubble" fill="none" stroke="url(#g)" strokeWidth="5" />
+                  <g transform="translate(28 32)">
+                    <rect x="4" y="26" width="10" height="26" rx="3" fill="url(#g)" />
+                    <rect x="20" y="14" width="10" height="38" rx="3" fill="url(#g)" />
+                    <rect x="36" y="32" width="10" height="20" rx="3" fill="url(#g)" />
+                  </g>
+                  <path d="M64 74l8 8 19-20" fill="none" stroke="#20C997" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+                  <use href="#bubble" fill="none" stroke="#ffffff" opacity="0.06" />
                 </g>
-                <path d="M64 74l8 8 19-20" fill="none" stroke="#20C997" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
-                <use href="#bubble" fill="none" stroke="#ffffff" opacity="0.06" />
               </svg>
 
               Poll-Craft
@@ -65,7 +67,7 @@ export function Navbar({ initialSession }: NavbarProps) {
             </Link>
 
             <div className="hidden flex-1 items-center justify-center gap-2 md:flex">
-              <div className="flex flex-col items-center gap-2">
+              <div className="flex flex-col items-center gap-2 md:flex-row md:gap-4">
                 {navLinks.map((item) => {
                   const isActive = pathname === item.href || pathname?.startsWith(`${item.href}/`);
                   return (
