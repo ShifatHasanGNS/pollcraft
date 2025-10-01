@@ -67,7 +67,7 @@ const capabilities = [
   },
 ];
 
-export default async function MarketingPage() {
+export default async function HomePage() {
   const session = await auth();
   const isAuthenticated = Boolean(session?.user);
 
@@ -78,8 +78,8 @@ export default async function MarketingPage() {
         <div className="absolute bottom-[-25%] right-[-15%] h-[560px] w-[560px] rounded-full bg-gradient-to-br from-[rgba(168,85,247,0.25)] via-[rgba(96,165,250,0.18)] to-transparent blur-3xl" />
       </div>
 
-      <section className="mx-auto flex min-h-[70vh] w-full max-w-6xl flex-col items-center px-6 pb-20 pt-28 text-center sm:pt-32">
-        <span className="rounded-full border border-white/15 bg-white/10 px-4 py-1 text-xs uppercase tracking-[0.35em] text-muted">
+      <section className="mx-auto flex min-h-[70vh] w-full max-w-6xl flex-col items-center text-center px-6 pb-20 pt-16 sm:pt-24">
+        <span className="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs uppercase tracking-[0.35em] text-muted">
           open-source • community friendly
         </span>
         <h1 className="mt-6 max-w-4xl text-4xl font-semibold leading-tight text-[var(--foreground)] sm:text-5xl lg:text-6xl">

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 40 512 512">
+  <defs>
+    <!-- Gradient: purple → teal -->
+    <linearGradient id="pc-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6A5AE0"/>
+      <stop offset="1" stop-color="#20C997"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" fill="#0B1220"/>
+
+  <!-- Chat bubble outline -->
+  <path d="M128 128h256c22 0 40 18 40 40v176c0 22-18 40-40 40h-136l-50 46c-7 6-18 1-18-8v-38h-52c-22 0-40-18-40-40V168c0-22 18-40 40-40Z"
+        fill="none" stroke="url(#pc-grad)" stroke-width="20" stroke-linejoin="round"/>
+
+  <!-- Poll bars -->
+  <rect x="164" y="220" width="28" height="80" rx="6" fill="url(#pc-grad)"/>
+  <rect x="208" y="200" width="28" height="100" rx="6" fill="url(#pc-grad)"/>
+  <rect x="252" y="236" width="28" height="64" rx="6" fill="url(#pc-grad)"/>
+
+  <!-- Checkmark -->
+  <path d="M300 260l28 28 64-68" fill="none" stroke="#20C997" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

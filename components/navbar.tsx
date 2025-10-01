@@ -29,7 +29,6 @@ export function Navbar({ initialSession }: NavbarProps) {
   return (
     <header className="sticky top-0 z-10 flex w-full justify-center px-3 sm:px-6">
       <nav className="relative w-full max-w-6xl overflow-hidden px-4 py-3 shadow-[0_18px_45px_-20px_rgba(13,23,42,0.75)] backdrop-blur-md">
-        {/* <nav className="relative w-full max-w-6xl overflow-hidden bg-[rgba(11,22,33,0.85)] px-4 py-3 shadow-[0_18px_45px_-20px_rgba(13,23,42,0.75)] backdrop-blur-md rounded-[1.5rem] border border-white/8"> */}
         <div className="pointer-events-none absolute inset-0 opacity-60 [mask-image:radial-gradient(120%_140%_at_top,white,transparent)]">
           <div className="absolute inset-0 bg-[radial-gradient(320px_at_top,rgba(56,189,248,0.22),transparent)]" />
           <div className="absolute inset-0 bg-[radial-gradient(360px_at_bottom,rgba(16,185,129,0.18),transparent)]" />
@@ -37,11 +36,32 @@ export function Navbar({ initialSession }: NavbarProps) {
 
         <div className="relative flex flex-col gap-2">
           <div className="flex items-center justify-between gap-5">
+
             <Link
               href="/"
-              className="text-lg font-semibold uppercase tracking-[0.369em] text-white drop-shadow-[0_2px_12px_rgba(56,189,248,0.4)]"
+              className="flex gap-2 items-center text-lg font-semibold uppercase tracking-[0.369em] text-white drop-shadow-[0_2px_12px_rgba(56,189,248,0.4)]"
             >
-              Poll Craft
+
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="-10 -6 128 128">
+                <defs>
+                  <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stopColor="#6A5AE0" />
+                    <stop offset="1" stopColor="#20C997" />
+                  </linearGradient>
+                  <path id="bubble" d="M20 12h68a16 16 0 0 1 16 16v44a16 16 0 0 1-16 16H63l-14.8 13.5a6.5 6.5 0 0 1-10.9-5V88H20A16 16 0 0 1 4 72V28A16 16 0 0 1 20 12Z" />
+                </defs>
+                <use href="#bubble" fill="none" stroke="url(#g)" strokeWidth="5" />
+                <g transform="translate(28,32)">
+                  <rect x="4" y="26" width="10" height="26" rx="3" fill="url(#g)" />
+                  <rect x="20" y="14" width="10" height="38" rx="3" fill="url(#g)" />
+                  <rect x="36" y="32" width="10" height="20" rx="3" fill="url(#g)" />
+                </g>
+                <path d="M64 74l8 8 19-20" fill="none" stroke="#20C997" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+                <use href="#bubble" fill="none" stroke="#ffffff" opacity="0.06" />
+              </svg>
+
+              Poll-Craft
+
             </Link>
 
             <div className="hidden flex-1 items-center justify-center gap-2 md:flex">
