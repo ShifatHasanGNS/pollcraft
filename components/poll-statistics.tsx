@@ -193,8 +193,8 @@ export function PollStatisticsClient({ pollId, initial }: PollStatisticsClientPr
             {question.kind === "text" ? (
               <div className="rounded-lg border border-white/10 bg-black/20 p-4 text-sm text-muted">
                 <p>
-                  {question.text?.responses ?? 0} free-text response
-                  {(question.text?.responses ?? 0) === 1 ? "" : "s"}. Export tools will surface these answers soon.
+                  {question.text?.responses ?? 0} Free-Text Response
+                  {(question.text?.responses ?? 0) === 1 ? "" : "s"}.
                 </p>
               </div>
             ) : (
