@@ -1,7 +1,13 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 
 import { auth } from "@/lib/auth";
 import { buttonPrimaryTall, card, subCard } from "@/lib/styles";
+import {
+  generateVisitorToken,
+  getVisitorCookieName,
+  registerVisitor,
+} from "@/lib/metrics";
 
 const highlights = [
   {
@@ -70,6 +76,25 @@ const capabilities = [
 export default async function HomePage() {
   const session = await auth();
   const isAuthenticated = Boolean(session?.user);
+  const cookieStore = await cookies();
+  const visitorCookieName = getVisitorCookieName();
+  let visitorToken = cookieStore.get(visitorCookieName)?.value ?? null;
+
+  if (!visitorToken) {
+    visitorToken = generateVisitorToken();
+    cookieStore.set({
+      name: visitorCookieName,
+      value: visitorToken,
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365,
+    });
+  }
+
+  const visitorCount = await registerVisitor(visitorToken);
+  const visitorCountLabel = new Intl.NumberFormat().format(visitorCount);
 
   return (
     <main className="relative isolate overflow-hidden bg-background text-foreground">
@@ -79,9 +104,19 @@ export default async function HomePage() {
       </div>
 
       <section className="mx-auto flex min-h-[70vh] w-full max-w-6xl flex-col items-center text-center px-6 pb-20 pt-16 sm:pt-24">
-        <span className="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs uppercase tracking-[0.35em] text-muted">
-          open-source • community friendly
-        </span>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <span className="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs uppercase tracking-[0.35em] text-muted">
+            open-source • community friendly
+          </span>
+          <div className="flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2">
+            <span className="text-[10px] uppercase tracking-[0.35em] text-muted">
+              Total visitors
+            </span>
+            <span className="text-sm font-semibold text-foreground tracking-[0.08em]">
+              {visitorCountLabel}
+            </span>
+          </div>
+        </div>
         <h1 className="mt-6 max-w-4xl text-4xl font-semibold leading-tight text-[var(--foreground)] sm:text-5xl lg:text-6xl">
           Run thoughtful polls for classrooms, clubs, and communities.
         </h1>

@@ -1,4 +1,5 @@
 import {
+  bigint,
   boolean,
   integer,
   jsonb,
@@ -205,7 +206,7 @@ export const voteAggregates = pgTable(
       .notNull()
       .references(() => polls.id, { onDelete: "cascade" }),
     questionId: text("question_id").notNull(),
-    optionId: text("option_id"),
+    optionId: text("option_id").notNull(),
     count: integer("count").notNull().default(0),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   },
@@ -263,3 +264,14 @@ export const passwordCredentials = pgTable(
     ),
   }),
 );
+
+export const appMetrics = pgTable("app_metrics", {
+  key: text("key").primaryKey(),
+  value: bigint("value", { mode: "number" }).notNull().default(0),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
+export const visitorTokens = pgTable("visitor_tokens", {
+  tokenHash: text("token_hash").primaryKey(),
+  firstSeen: timestamp("first_seen", { withTimezone: true }).defaultNow(),
+});
