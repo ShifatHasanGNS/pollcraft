@@ -1,203 +1,144 @@
-# PollCraft — Proof-of-Concept Build Guide (Vercel + Next.js + Neon + NextAuth)
+# PollCraft — Architecture Notes
 
-This guide reflects the revised scope: PollCraft is now a proof-of-concept web app
-hosted on **Vercel**, using **Next.js (App Router)**, **Neon Postgres**, **Drizzle ORM**,
-and **NextAuth** (Auth.js) with credentials-based sign-in.
-
-The goal is to keep everything **functional and pleasant to use**, without the
-"military grade" edge/Workers stack from the original plan. Security remains
-sensible—hashed passwords, CSRF-safe forms, and session cookies—but we prioritise
-shipping a usable product quickly.
+PollCraft is a dark-first polling platform running on Vercel with Next.js 15, Neon Postgres, Drizzle ORM, and Auth.js (NextAuth). This document captures the current shape of the project so new contributors can orient themselves quickly.
 
 ---
 
-## 1) Product Goals & MVP Scope
+## Product Snapshot
 
-1. Authenticated owners can create, lock, and share polls.
-2. Owners invite voters or expose a public link. Voters can submit one ballot
-   per poll (enforced by a mix of device cookie + email verification for now).
-3. Realtime tallying is optional—initial MVP can refresh results on demand.
-4. Generate a lightweight AI summary (Gemini) after a poll closes.
-5. Entire experience feels cohesive in dark mode.
+- **Owners** create polls with multiple question types, commit the definition, and invite voters from an eligibility list.
+- **Voters** receive a single ballot (enforced via device token + optional email) and submit responses through the voting surface.
+- **Realtime statistics** update over SSE; dashboards also expose participant-level answers for identified polls.
+- **Visitor analytics** record unique visitors in Postgres so the landing page can display a live count.
+- **Email notifications** are sent through Resend as soon as a listed poll is committed (if credentials are present).
 
-Nice-to-haves (stretch): enriched charts, CSV export, invitations via email,
-magic-link sign-in.
+Removed in this iteration: AI summaries and unused SSE helpers—focus is on core polling UX.
 
 ---
 
-## 2) Architecture Overview
+## Tech Stack
 
-- **Runtime**: Next.js 15 (App Router) on Vercel.
-- **Database**: Neon Postgres (HTTP connection via `@neondatabase/serverless`).
-- **ORM & Migrations**: Drizzle ORM + Drizzle Kit.
-- **Authentication**: NextAuth (Auth.js) with Credentials provider and Drizzle adapter.
-- **Styling/UI**: Tailwind CSS 4 + shadcn/ui components (dark theme only).
-- **Forms**: React Hook Form + Zod.
-- **Charts**: Apache ECharts (React wrapper).
-- **Email**: Resend (magic link/invites optional but recommended).
-- **AI Summaries**: Google Gemini Flash via REST API.
-
-Why NextAuth over Lucia? Vercel-native, batteries-included session handling, and
-fewer moving parts when deployed on Node runtime.
+| Concern            | Implementation                                  |
+| ------------------ | ----------------------------------------------- |
+| Runtime            | Next.js 15 App Router (Node runtime)            |
+| Database           | Neon Postgres via `@neondatabase/serverless`    |
+| ORM / Migrations   | Drizzle ORM + Drizzle Kit                       |
+| Auth               | NextAuth credentials provider + Drizzle adapter |
+| Forms & Validation | React Hook Form + Zod                           |
+| Charts             | `echarts` + `echarts-for-react`                 |
+| Email              | Resend REST API                                 |
+| Styling            | Tailwind CSS 4 (custom tokens)                  |
 
 ---
 
-## 3) Repository Layout
+## Repository Layout
 
-```
-pollcraft/
-├─ app/
-│  ├─ (marketing)/page.tsx       # Landing/hero content
-│  ├─ dashboard/                 # Authenticated owner UI
-│  │  ├─ page.tsx
-│  │  └─ polls/
-│  │     ├─ new/page.tsx         # Poll builder shell
-│  │     └─ [pollId]/page.tsx    # Poll management + results
-│  ├─ vote/[pollId]/page.tsx     # Voter entry
-│  ├─ r/[token]/page.tsx         # Shared read-only results/report
-│  └─ api/
-│     ├─ auth/[...nextauth]/route.ts   # NextAuth handlers
-│     ├─ polls/route.ts                # GET/POST polls
-│     ├─ polls/[id]/commit/route.ts    # POST commit
-│     ├─ polls/[id]/ballots/route.ts   # POST ballot creation (todo)
-│     ├─ ballots/[id]/submit/route.ts  # POST submit votes (todo)
-│     ├─ polls/[id]/results/route.ts   # GET aggregates
-│     └─ polls/[id]/report/route.ts    # POST AI summary
-├─ drizzle/
-│  ├─ schema.ts                 # All tables & enums
-│  └─ migrations/               # SQL migrations
-├─ lib/
-│  ├─ db.ts                     # Neon HTTP + Drizzle
-│  ├─ auth.ts                   # NextAuth configuration + helpers
-│  ├─ email.ts
-│  ├─ hash.ts                   # Hashing helpers
-│  ├─ ai.ts                     # Gemini interactions (stub)
-│  └─ rate-limit.ts             # Device/email heuristics (stub)
-├─ styles/
-│  └─ globals.css
-├─ docs/Project_Documentation.md
-├─ README.md
-├─ package.json
-└─ .env.example
+```.
+app/
+  (home)/page.tsx                 # Landing page + visitor counter
+  dashboard/page.tsx              # Owner overview
+  dashboard/polls/[pollId]/page.tsx
+  polls/page.tsx                  # Poll list for owners
+  polls/[pollId]/page.tsx         # Voting surface
+  polls/[pollId]/details/page.tsx # Public poll details
+  polls/[pollId]/statistics/page.tsx
+  api/
+    auth/[...nextauth]/route.ts
+    polls/route.ts
+    polls/[id]/commit/route.ts
+    polls/[id]/ballots/route.ts
+    polls/[id]/events/route.ts
+    ballots/[id]/submit/route.ts
+    polls/[id]/results/route.ts
+components/                       # UI building blocks
+drizzle/schema.ts                 # Source-of-truth schema
+drizzle/migrations/               # Generated SQL
+lib/                              # Server utilities (auth, db, email, metrics, stats)
+docs/Project_Documentation.md     # This file
 ```
 
 ---
 
-## 4) Environment Variables
+## Data Model Highlights
 
-Create `.env.local` for local dev and configure matching variables in Vercel.
+- **Poll definition**: `polls`, `questions`, `options`
+- **Ballots**: `ballots` (issue) and `votes` (responses)
+- **Aggregates**: `vote_aggregates` stores per-question counts for fast dashboards (PK: pollId + questionId + optionId)
+- **Eligibility**: `eligibility_lists` + `eligibility_list_items`, including `invited` flag for email notifications
+- **Metrics**: `app_metrics` (key/value) and `visitor_tokens` (hashed identifiers) power the landing-page visitor badge
+- **Auth**: standard NextAuth tables plus `password_credentials` for the credentials provider
 
-```
-# Database
-DATABASE_URL="postgres://USER:PASSWORD@HOST/db?sslmode=require"
-
-# NextAuth secrets
-NEXTAUTH_URL="http://localhost:3000"          # Vercel will override with prod URL
-NEXTAUTH_SECRET="random-long-string"
-
-# Resend
-RESEND_API_KEY="re_xxx"
-EMAIL_FROM="PollCraft <noreply@yourdomain.com>"
-
-# AI
-GEMINI_API_KEY="AIza..."
-MODEL_NAME="gemini-2.5-flash"
-
-# App config
-APP_URL="https://pollcraft.vercel.app"
-```
-
-No Cloudflare keys necessary anymore. When deploying to Vercel, set each key via
-the dashboard or `vercel env` commands.
+`pnpm db:generate` emits migrations, `pnpm db:push` applies them to Neon.
 
 ---
 
-## 5) Database Schema (Drizzle)
+## Key Request Flows
 
-Key tables (see `drizzle/schema.ts` for full definitions):
+### Poll Creation
 
-- `users` — poll owners/voters (email unique). Includes display name.
-- `accounts`, `sessions`, `verificationTokens` — required by NextAuth.
-- `passwordCredentials` — hashed credentials for credentials provider.
-- `polls`, `questions`, `options` — poll definition.
-- `ballots`, `votes` — submitted votes (append-only).
-- `voteAggregates` — aggregated counts per poll/question/option.
-- `shareLinks` — tokens for shared reports/results.
-- `auditLogs` — simple audit history (hash chaining optional for MVP).
+1. `app/dashboard/polls/new` renders the builder (`components/poll-builder.tsx`).
+2. Submitting POSTs to `app/api/polls/route.ts`, which:
+   - Inserts the poll, questions, options.
+   - Creates an eligibility list (if visibility is `listed`).
 
-Use Drizzle Kit to manage SQL migrations:
+### Poll Commitment
 
-```bash
-pnpm db:generate   # emit SQL from schema changes
-pnpm db:push       # apply migrations to Neon
-```
+1. Owners trigger `POST /api/polls/:id/commit`.
+2. Route locks the definition (definition hash + `committed_at`).
+3. Eligibility rows are deduped and, if Resend is configured, emails are delivered.
+4. Successful sends mark `eligibility_list_items.invited = true`.
 
----
+### Ballot Lifecycle
 
-## 6) Authentication Flow (NextAuth)
+1. Voting page calls `POST /api/polls/:id/ballots` to obtain a ballot ID/device token.
+2. Submitting responses hits `POST /api/ballots/:id/submit`, recording votes and marking the ballot submitted.
+3. Submission publishes a `votes:updated` event via `lib/realtime.ts`.
 
-- **Sign-up**: custom API route collects email + password, hashes with `bcrypt`,
-  inserts user + credential row, then calls `signIn()` (or returns `200` for client).
-- **Sign-in**: NextAuth credentials provider verifies the password hash and
-  issues a session cookie stored in `sessions` table.
-- **Session access**: use `auth()` helper (Auth.js) in server components or
-  `getServerSession()` in route handlers.
-- **Future**: add OAuth providers by extending the NextAuth config. Magic links
-  can be implemented via NextAuth email provider + Resend.
+### Realtime Statistics
 
----
+1. Client subscribes to `/api/polls/:id/events` SSE stream.
+2. Server sends an initial snapshot plus updates whenever votes arrive.
+3. `components/poll-statistics.tsx` renders charts with padded axes to avoid label clipping.
 
-## 7) Implementation Checklist
+### Visitor Tracking
 
-### Phase 1 — Foundation
-- [x] Bootstrap Next.js project with Tailwind 4.
-- [x] Set up dark-mode design tokens & base pages.
-- [x] Configure Drizzle + Neon, add schema + migrations.
-- [x] Integrate NextAuth (credentials provider) and secure dashboard routes.
-- [x] Implement poll creation & commit API routes.
-
-### Phase 2 — Voting Flows
-- [x] Ballot creation (device cookie + optional email verification).
-- [x] Vote submission endpoint with validation and aggregate update trigger.
-- [ ] Results page for owners (dashboard) and shared token route.
-
-### Phase 3 — Enhancements
-- [ ] AI summary generation via Gemini (HTML + PDF export).
-- [ ] Email invitations via Resend (optional magic link).
-- [ ] ECharts visualisations + CSV export.
+1. `app/(home)/page.tsx` hashes a long-lived cookie and registers visitors through `lib/metrics.ts`.
+2. `app_metrics` stores the running total, exposed near the hero pill.
 
 ---
 
-## 8) Deployment Workflow (Vercel)
+## Environment Variables
 
-1. `pnpm build` locally to ensure no type/lint errors.
-2. Connect GitHub repository to Vercel and push to main branch, **or** run:
-   ```bash
-   vercel deploy --prod
-   ```
-3. Ensure env vars are set in Vercel project (`vercel env add` or UI).
-4. Run migrations separately via Neon console or GitHub Action (Drizzle CLI).
+| Variable                        | Description                                                      |
+| ------------------------------- | ---------------------------------------------------------------- |
+| `DATABASE_URL`                  | Neon/Postgres connection string (required)                       |
+| `NEXTAUTH_URL`                  | Base URL for NextAuth callbacks                                  |
+| `NEXTAUTH_SECRET`               | Session/JWT secret; also used for visitor-token hashing fallback |
+| `RESEND_API_KEY` & `EMAIL_FROM` | Enable invite notifications after poll commit                    |
+| `APP_URL`                       | Public URL used when composing email links                       |
+| `NEXT_PUBLIC_APP_URL`           | Optional, used client-side for share URLs                        |
+| `METRICS_SECRET`                | Optional salt for visitor hashing                                |
 
----
-
-## 9) Testing
-
-- **Unit**: validators, password hashing helpers (Vitest recommended).
-- **Integration**: NextAuth credentials flow, poll commit, vote submission.
-- **E2E**: Playwright for the full create → vote → view results loop (optional).
-
-For the POC, focus on manual QA + targeted unit/integration tests.
+Missing email env vars will skip notifications with a console warning.
 
 ---
 
-## 10) Future Considerations
+## Tooling & Quality
 
-- Upgrade to OAuth or passwordless flows when ready.
-- Add WebSocket/SSE for realtime updates if demand grows.
-- Harden rate limiting and anti-abuse heuristics once the prototype attracts traffic.
-- Reintroduce Cloudflare Workers/Turnstile only if scale or security dictates.
+- **Linting**: `pnpm lint` (React Compiler) — addresses purity warnings and incompatible hooks.
+- **Database**: `pnpm db:generate`, `pnpm db:push`, `pnpm db:studio`.
+- **Testing**: No automated tests yet; focus on manual QA. Future work could add Vitest + Playwright.
 
 ---
 
-**You’re set for the Vercel + NextAuth proof-of-concept.** Follow this document as
-the new source of truth while iterating. EOF
+## Future Work
+
+- Shared read-only results route still surfaces placeholder copy (`app/r/[token]/page.tsx`).
+- AI summaries were removed; reintroduce by adding a provider and wiring totals into a summariser.
+- CSV export and richer analytics (per-question filters, cross-tabs).
+- Rate-limit or abuse mitigations beyond the current device/email hashing.
+- OAuth providers or passwordless auth to improve voter onboarding.
+
+---
+
+Keep this document in sync with structural changes—especially API contracts, schema updates, and new infrastructure pieces. It should remain the single source of truth for the architectural intent behind PollCraft.
