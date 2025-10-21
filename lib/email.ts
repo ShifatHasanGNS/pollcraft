@@ -6,12 +6,26 @@ type SendEmailInput = {
   html: string;
 };
 
-export async function sendEmail({ to, subject, html }: SendEmailInput) {
-  const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.EMAIL_FROM;
+function getEmailConfig() {
+  return {
+    apiKey: process.env.RESEND_API_KEY,
+    from: process.env.EMAIL_FROM,
+  };
+}
+
+export function isEmailConfigured(): boolean {
+  const { apiKey, from } = getEmailConfig();
+  return Boolean(apiKey && from);
+}
+
+export async function sendEmail({ to, subject, html }: SendEmailInput): Promise<void> {
+  const { apiKey, from } = getEmailConfig();
 
   if (!apiKey || !from) {
-    throw new Error("Email configuration is missing RESEND_API_KEY or EMAIL_FROM");
+    console.warn(
+      `[email] Missing RESEND_API_KEY or EMAIL_FROM. Skipping email to ${to}.`,
+    );
+    return;
   }
 
   const response = await fetch(RESEND_ENDPOINT, {
@@ -24,7 +38,7 @@ export async function sendEmail({ to, subject, html }: SendEmailInput) {
   });
 
   if (!response.ok) {
-    const detail = await response.text();
-    throw new Error(`Failed to send email: ${detail}`);
+    const detail = await response.text().catch(() => "Unknown error");
+    throw new Error(`Failed to send email to ${to}: ${detail}`);
   }
 }
