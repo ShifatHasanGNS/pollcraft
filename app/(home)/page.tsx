@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 
+import VisitorCounter from "@/components/visitor-counter";
 import { auth } from "@/lib/auth";
 import { buttonPrimaryTall, card, subCard } from "@/lib/styles";
 import {
-  generateVisitorToken,
   getVisitorCookieName,
+  getVisitorTotal,
   registerVisitor,
 } from "@/lib/metrics";
 
@@ -77,7 +78,15 @@ export default async function HomePage() {
   const session = await auth();
   const isAuthenticated = Boolean(session?.user);
 
-  const { visitorCountLabel } = await getOrRegisterVisitor();
+  const cookieStore = await cookies();
+  const visitorCookieName = getVisitorCookieName();
+  const visitorToken = cookieStore.get(visitorCookieName)?.value ?? null;
+
+  const visitorCount = visitorToken
+    ? await registerVisitor(visitorToken)
+    : await getVisitorTotal();
+  const visitorCountLabel = new Intl.NumberFormat().format(visitorCount);
+  const needsVisitorRegistration = !visitorToken;
 
   return (
     <main className="relative isolate overflow-hidden bg-background text-foreground">
@@ -96,7 +105,10 @@ export default async function HomePage() {
               Total visitors
             </span>
             <span className="text-sm font-semibold text-foreground tracking-[0.08em]">
-              {visitorCountLabel}
+              <VisitorCounter
+                initialLabel={visitorCountLabel}
+                needsRegistration={needsVisitorRegistration}
+              />
             </span>
           </div>
         </div>
@@ -171,31 +183,4 @@ export default async function HomePage() {
       </footer>
     </main>
   );
-}
-
-async function getOrRegisterVisitor() {
-  "use server";
-
-  const cookieStore = await cookies();
-  const visitorCookieName = getVisitorCookieName();
-  let visitorToken = cookieStore.get(visitorCookieName)?.value ?? null;
-
-  if (!visitorToken) {
-    visitorToken = generateVisitorToken();
-    cookieStore.set({
-      name: visitorCookieName,
-      value: visitorToken,
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 365,
-    });
-  }
-
-  const visitorCount = await registerVisitor(visitorToken);
-
-  return {
-    visitorCountLabel: new Intl.NumberFormat().format(visitorCount),
-  };
 }
