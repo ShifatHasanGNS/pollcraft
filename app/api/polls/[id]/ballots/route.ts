@@ -7,6 +7,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { hashWithSalt, generateDeviceToken } from "@/lib/hash";
 import { checkAndIncrement } from "@/lib/rate-limit";
+import { pruneExpiredPolls } from "@/lib/poll-maintenance";
 import { ballots, polls } from "@/drizzle/schema";
 
 const CreateBallotBody = z.object({
@@ -29,6 +30,9 @@ export async function POST(
   context: { params: Promise<{ id: string }> },
 ) {
   const { id: pollId } = await context.params;
+
+  await pruneExpiredPolls();
+
   const pollRecord = await db
     .select({
       id: polls.id,

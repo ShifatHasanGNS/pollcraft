@@ -6,6 +6,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { withDbRetry } from "@/lib/db-retry";
 import { card, subCard } from "@/lib/styles";
+import { pruneExpiredPolls } from "@/lib/poll-maintenance";
 import {
   polls,
   questions,
@@ -28,6 +29,8 @@ export default async function PollDetailsPage({
   if (!session?.user) {
     redirect("/login");
   }
+
+  await pruneExpiredPolls();
 
   const safeRetry = async <T,>(operation: () => Promise<T>, fallback: T): Promise<T> => {
     try {

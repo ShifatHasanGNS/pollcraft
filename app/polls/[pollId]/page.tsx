@@ -10,6 +10,7 @@ import {
   options as pollOptions,
 } from "@/drizzle/schema";
 import { VoteForm } from "@/components/vote-form";
+import { pruneExpiredPolls } from "@/lib/poll-maintenance";
 
 type PollVotePageProps = {
   params: Promise<{ pollId: string }>;
@@ -33,6 +34,8 @@ export default async function PollVotePage({
       return fallback;
     }
   };
+
+  await pruneExpiredPolls();
 
   const pollRecord = await safe(
     () =>

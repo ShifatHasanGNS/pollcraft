@@ -12,6 +12,7 @@ import {
   eligibilityLists,
   eligibilityItems,
 } from "@/drizzle/schema";
+import { pruneExpiredPolls } from "@/lib/poll-maintenance";
 
 const PollBody = z.object({
   title: z.string().min(3).max(200),
@@ -43,6 +44,8 @@ export async function GET() {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  await pruneExpiredPolls();
 
   const userPolls = await db
     .select({

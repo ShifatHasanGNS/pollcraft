@@ -6,6 +6,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { withDbRetry } from "@/lib/db-retry";
 import { buttonPrimary, card } from "@/lib/styles";
+import { pruneExpiredPolls } from "@/lib/poll-maintenance";
 import { polls } from "@/drizzle/schema";
 
 export default async function DashboardPage() {
@@ -14,6 +15,8 @@ export default async function DashboardPage() {
     redirect("/login");
   }
   const ownerId = session.user.id;
+
+  await pruneExpiredPolls();
 
   const userPolls = await (async () => {
     try {
