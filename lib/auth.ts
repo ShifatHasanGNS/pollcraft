@@ -4,7 +4,6 @@ import bcrypt from "bcryptjs";
 import type { NextAuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { getServerSession } from "next-auth";
-
 import { db } from "@/lib/db";
 import {
   accounts,

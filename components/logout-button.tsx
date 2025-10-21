@@ -2,7 +2,6 @@
 
 import { useTransition } from "react";
 import { signOut } from "next-auth/react";
-
 import { buttonSecondary } from "@/lib/styles";
 
 type LogoutButtonProps = {

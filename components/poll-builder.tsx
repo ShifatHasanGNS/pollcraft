@@ -6,7 +6,6 @@ import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import clsx from "clsx";
-
 import { buttonPrimary, card, subCard } from "@/lib/styles";
 
 const PollSchema = z.object({
@@ -72,9 +71,9 @@ export function PollBuilder({ className }: PollBuilderProps) {
       prev.map((q) =>
         q.id === questionId
           ? {
-              ...q,
-              options: q.options.map((opt, optIndex) => (optIndex === index ? value : opt)),
-            }
+            ...q,
+            options: q.options.map((opt, optIndex) => (optIndex === index ? value : opt)),
+          }
           : q,
       ),
     );
@@ -129,9 +128,9 @@ export function PollBuilder({ className }: PollBuilderProps) {
     const trimmedEmails =
       values.visibility === "listed"
         ? (values.listedEmails ?? "")
-            .split(",")
-            .map((email) => email.trim().toLowerCase())
-            .filter((email) => email.length > 0)
+          .split(",")
+          .map((email) => email.trim().toLowerCase())
+          .filter((email) => email.length > 0)
         : [];
 
     const payload = {
@@ -199,47 +198,47 @@ export function PollBuilder({ className }: PollBuilderProps) {
               <span className="text-xs text-red-400">{errors.description.message}</span>
             )}
           </label>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <label className="flex flex-col gap-2 text-sm">
-            <span>Visibility</span>
-            <select
-              className="rounded-lg border border-white/15 bg-black/25 px-3 py-2 text-foreground outline-none focus:border-white/40"
-              {...register("visibility")}
-            >
-              <option value="public">Public</option>
-              <option value="listed">Listed</option>
-            </select>
-          </label>
-          <label className="flex flex-col gap-2 text-sm">
-            <span>Identity mode</span>
-            <select
-              className="rounded-lg border border-white/15 bg-black/25 px-3 py-2 text-foreground outline-none focus:border-white/40"
-              {...register("identityMode")}
-            >
-              <option value="anonymous">Anonymous</option>
-              <option value="identified">Identified</option>
-            </select>
-          </label>
-        </div>
-        {visibility === "listed" && (
-          <label className="mt-4 flex flex-col gap-2 text-sm">
-            <span>Listed voter emails</span>
-            <textarea
-              rows={3}
-              placeholder="friend@example.com, teammate@example.com"
-              className="rounded-lg border border-white/15 bg-black/25 px-3 py-2 text-foreground outline-none focus:border-white/40"
-              {...register("listedEmails")}
-            />
-            <span className="text-xs text-muted">
-              Add comma-separated emails. Only these registered users will see this poll in their dashboard and
-              Polls page.
-            </span>
-          </label>
-        )}
-        <div className="grid gap-3 sm:grid-cols-2">
-          <label className="flex flex-col gap-2 text-sm">
-            <span>Opens at</span>
-            <input
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="flex flex-col gap-2 text-sm">
+              <span>Visibility</span>
+              <select
+                className="rounded-lg border border-white/15 bg-black/25 px-3 py-2 text-foreground outline-none focus:border-white/40"
+                {...register("visibility")}
+              >
+                <option value="public">Public</option>
+                <option value="listed">Listed</option>
+              </select>
+            </label>
+            <label className="flex flex-col gap-2 text-sm">
+              <span>Identity mode</span>
+              <select
+                className="rounded-lg border border-white/15 bg-black/25 px-3 py-2 text-foreground outline-none focus:border-white/40"
+                {...register("identityMode")}
+              >
+                <option value="anonymous">Anonymous</option>
+                <option value="identified">Identified</option>
+              </select>
+            </label>
+          </div>
+          {visibility === "listed" && (
+            <label className="mt-4 flex flex-col gap-2 text-sm">
+              <span>Listed voter emails</span>
+              <textarea
+                rows={3}
+                placeholder="friend@example.com, teammate@example.com"
+                className="rounded-lg border border-white/15 bg-black/25 px-3 py-2 text-foreground outline-none focus:border-white/40"
+                {...register("listedEmails")}
+              />
+              <span className="text-xs text-muted">
+                Add comma-separated emails. Only these registered users will see this poll in their dashboard and
+                Polls page.
+              </span>
+            </label>
+          )}
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="flex flex-col gap-2 text-sm">
+              <span>Opens at</span>
+              <input
                 type="datetime-local"
                 className="rounded-lg border border-white/15 bg-black/25 px-3 py-2 text-foreground outline-none focus:border-white/40"
                 {...register("opensAt")}
@@ -297,17 +296,17 @@ export function PollBuilder({ className }: PollBuilderProps) {
               </label>
               <label className="mt-3 flex flex-col gap-2 text-sm">
                 <span>Question type</span>
-              <select
-                value={question.kind}
-                onChange={(event) =>
-                  updateQuestion(question.id, {
-                    kind: event.target.value as DraftQuestion["kind"],
-                    options:
-                      event.target.value === "text" ? [] : question.options.length ? question.options : ["", ""],
-                  })
-                }
-                className="rounded-lg border border-white/15 bg-black/25 px-3 py-2 text-foreground outline-none focus:border-white/40"
-              >
+                <select
+                  value={question.kind}
+                  onChange={(event) =>
+                    updateQuestion(question.id, {
+                      kind: event.target.value as DraftQuestion["kind"],
+                      options:
+                        event.target.value === "text" ? [] : question.options.length ? question.options : ["", ""],
+                    })
+                  }
+                  className="rounded-lg border border-white/15 bg-black/25 px-3 py-2 text-foreground outline-none focus:border-white/40"
+                >
                   <option value="single">Single choice</option>
                   <option value="multi">Multi select</option>
                   <option value="ranked">Ranked</option>

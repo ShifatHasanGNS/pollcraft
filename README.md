@@ -74,7 +74,7 @@ PollCraft is a dark-mode polling platform built with Next.js 15 (App Router), Dr
 
 ## Project Structure
 
-```
+```.
 app/                 # Routes (marketing, auth, dashboard, API)
   (home)/            # Landing page with visitor badge
   dashboard/         # Owner dashboards and poll details

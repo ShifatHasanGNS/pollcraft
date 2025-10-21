@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-
 import { buttonPrimary } from "@/lib/styles";
 
 interface CommitPollButtonProps {

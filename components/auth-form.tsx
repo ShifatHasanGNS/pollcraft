@@ -7,7 +7,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import clsx from "clsx";
-
 import { buttonPrimary } from "@/lib/styles";
 
 const Schema = z.object({
@@ -23,14 +22,10 @@ type Props = {
 
 export function AuthForm({ className }: Props) {
   const router = useRouter();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<FormValues>({
-    resolver: zodResolver(Schema),
-  });
   const [error, setError] = useState<string | null>(null);
+
+  const { register, handleSubmit, formState: { errors, isSubmitting } } =
+    useForm<FormValues>({ resolver: zodResolver(Schema) });
 
   async function onSubmit(values: FormValues) {
     setError(null);

@@ -45,7 +45,7 @@ export async function withDbRetry<T>(operation: () => Promise<T>, retries = DEFA
   let attempt = 0;
   let delay = baseDelayMs;
 
-  for (;;) {
+  for (; ;) {
     try {
       return await operation();
     } catch (error) {

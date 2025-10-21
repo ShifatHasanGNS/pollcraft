@@ -1,7 +1,6 @@
 import { sql } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import Link from "next/link";
-
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { SharePollButton } from "@/components/share-poll-button";
@@ -22,11 +21,7 @@ type PollRecord = {
   has_voted: boolean;
 };
 
-export default async function PollsPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ q?: string }>;
-}) {
+export default async function PollsPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const session = await auth();
   const params = await searchParams;
   const searchTerm = params.q?.trim() ? `%${params.q!.trim()}%` : null;

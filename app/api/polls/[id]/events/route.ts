@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-
 import { getPollStatistics } from "@/lib/poll-stats";
 import { subscribeToPoll } from "@/lib/realtime";
 

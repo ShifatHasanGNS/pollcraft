@@ -1,8 +1,8 @@
 import { randomUUID, createHash } from "node:crypto";
 import { NextResponse } from "next/server";
+import { pruneExpiredPolls } from "@/lib/poll-maintenance";
 import { z } from "zod";
 import { desc, eq } from "drizzle-orm";
-
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import {
@@ -12,7 +12,6 @@ import {
   eligibilityLists,
   eligibilityItems,
 } from "@/drizzle/schema";
-import { pruneExpiredPolls } from "@/lib/poll-maintenance";
 
 const PollBody = z.object({
   title: z.string().min(3).max(200),

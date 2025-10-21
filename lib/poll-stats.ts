@@ -1,5 +1,5 @@
+import { withDbRetry } from "@/lib/db-retry";
 import { sql, eq, inArray, and, isNotNull } from "drizzle-orm";
-
 import { db } from "@/lib/db";
 import {
   ballots,
@@ -8,7 +8,6 @@ import {
   options as pollOptions,
   votes,
 } from "@/drizzle/schema";
-import { withDbRetry } from "@/lib/db-retry";
 
 type OptionStat = {
   optionId: string;
@@ -122,18 +121,18 @@ export async function getPollStatistics(pollId: string): Promise<PollStatistics 
 
   const optionRecords = questionIds.length
     ? await safe(
-        () =>
-          db
-            .select({
-              id: pollOptions.id,
-              questionId: pollOptions.questionId,
-              label: pollOptions.label,
-              order: pollOptions.orderIndex,
-            })
-            .from(pollOptions)
-            .where(inArray(pollOptions.questionId, questionIds)),
-        [] as Array<{ id: string; questionId: string; label: string; order: number }>,
-      )
+      () =>
+        db
+          .select({
+            id: pollOptions.id,
+            questionId: pollOptions.questionId,
+            label: pollOptions.label,
+            order: pollOptions.orderIndex,
+          })
+          .from(pollOptions)
+          .where(inArray(pollOptions.questionId, questionIds)),
+      [] as Array<{ id: string; questionId: string; label: string; order: number }>,
+    )
     : [];
 
   const optionsByQuestion = optionRecords.reduce<Record<string, typeof optionRecords>>((acc, option) => {

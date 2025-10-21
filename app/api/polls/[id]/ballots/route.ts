@@ -3,7 +3,6 @@ import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { and, eq, or } from "drizzle-orm";
 import { z } from "zod";
-
 import { db } from "@/lib/db";
 import { hashWithSalt, generateDeviceToken } from "@/lib/hash";
 import { checkAndIncrement } from "@/lib/rate-limit";

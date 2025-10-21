@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { sql } from "drizzle-orm";
-
 import { db } from "@/lib/db";
 import { withDbRetry } from "@/lib/db-retry";
 import { SharePollButton } from "@/components/share-poll-button";

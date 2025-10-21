@@ -7,10 +7,7 @@ type VisitorCounterProps = {
   needsRegistration: boolean;
 };
 
-export default function VisitorCounter({
-  initialLabel,
-  needsRegistration,
-}: VisitorCounterProps) {
+export default function VisitorCounter({ initialLabel, needsRegistration }: VisitorCounterProps) {
   const [label, setLabel] = useState(initialLabel);
 
   useEffect(() => {

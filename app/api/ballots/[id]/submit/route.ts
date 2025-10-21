@@ -1,8 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
+import { publishPollEvent } from "@/lib/realtime";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { z } from "zod";
-
 import { db } from "@/lib/db";
 import {
   ballots,
@@ -11,7 +11,6 @@ import {
   options as pollOptions,
   votes,
 } from "@/drizzle/schema";
-import { publishPollEvent } from "@/lib/realtime";
 
 const SubmitBody = z.object({
   responses: z.array(
@@ -59,9 +58,9 @@ export async function POST(
   const questionIds = pollQuestions.map((q) => q.id);
   const optionRecords = questionIds.length
     ? await db
-        .select()
-        .from(pollOptions)
-        .where(inArray(pollOptions.questionId, questionIds))
+      .select()
+      .from(pollOptions)
+      .where(inArray(pollOptions.questionId, questionIds))
     : [];
 
   const optionsByQuestion = optionRecords.reduce<

@@ -3,7 +3,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
-
 import { buttonPrimary, subCard } from "@/lib/styles";
 
 type VoteQuestion = {

@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { eq, inArray } from "drizzle-orm";
-
-import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
 import { withDbRetry } from "@/lib/db-retry";
 import { card, subCard } from "@/lib/styles";
 import { pruneExpiredPolls } from "@/lib/poll-maintenance";
+import { CommitPollButton } from "@/components/commit-poll-button";
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { eq, inArray } from "drizzle-orm";
 import {
   polls,
   questions,
@@ -17,13 +17,8 @@ import {
   eligibilityLists,
   eligibilityItems,
 } from "@/drizzle/schema";
-import { CommitPollButton } from "@/components/commit-poll-button";
 
-export default async function PollDetailsPage({
-  params,
-}: {
-  params: Promise<{ pollId: string }>;
-}) {
+export default async function PollDetailsPage({ params }: { params: Promise<{ pollId: string }> }) {
   const { pollId } = await params;
   const session = await auth();
   if (!session?.user) {
@@ -73,7 +68,7 @@ export default async function PollDetailsPage({
 
   const questionIds = pollQuestions.map((q) => q.id);
 
-  const optionRecords = questionIds.length
+  const optionRecords = !!questionIds.length
     ? await safeRetry(
       () =>
         db

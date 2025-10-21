@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { eq, inArray } from "drizzle-orm";
-
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { createDefinitionHash } from "@/lib/hash";
@@ -79,9 +78,9 @@ export async function POST(
   }
   const questionOptions = questionIds.length
     ? await db
-        .select()
-        .from(pollOptions)
-        .where(inArray(pollOptions.questionId, questionIds))
+      .select()
+      .from(pollOptions)
+      .where(inArray(pollOptions.questionId, questionIds))
     : [];
 
   const definitionHash = createDefinitionHash({

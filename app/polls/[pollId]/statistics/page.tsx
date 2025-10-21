@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-
 import { PollStatisticsClient } from "@/components/poll-statistics";
 import { SharePollButton } from "@/components/share-poll-button";
 import { getPollStatistics } from "@/lib/poll-stats";

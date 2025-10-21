@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
-
 import { buttonPrimary, buttonSecondary } from "@/lib/styles";
 import { LogoutButton } from "@/components/logout-button";
 import type { SessionWithUser } from "@/lib/auth";
@@ -24,8 +23,10 @@ export function Navbar({ initialSession }: NavbarProps) {
     { label: "Polls", href: "/polls" },
     ...(isAuthenticated ? [{ label: "Dashboard", href: "/dashboard" }] : []),
   ];
+
   const toggleMobile = () => setMobileOpen((prev) => !prev);
   const closeMobile = () => setMobileOpen(false);
+
   return (
     <header className="sticky top-0 z-10 flex w-full justify-center px-3 sm:px-6">
       <nav className="relative w-full max-w-6xl overflow-hidden px-4 py-3 shadow-[0_18px_45px_-20px_rgba(13,23,42,0.75)] backdrop-blur-md">

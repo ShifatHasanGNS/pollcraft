@@ -1,16 +1,15 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
-import { eq, inArray } from "drizzle-orm";
-
+import { VoteForm } from "@/components/vote-form";
+import { pruneExpiredPolls } from "@/lib/poll-maintenance";
 import { db } from "@/lib/db";
 import { withDbRetry } from "@/lib/db-retry";
+import { eq, inArray } from "drizzle-orm";
 import {
   polls,
   questions,
   options as pollOptions,
 } from "@/drizzle/schema";
-import { VoteForm } from "@/components/vote-form";
-import { pruneExpiredPolls } from "@/lib/poll-maintenance";
 
 type PollVotePageProps = {
   params: Promise<{ pollId: string }>;
@@ -72,13 +71,13 @@ export default async function PollVotePage({
   const questionIds = questionRecords.map((q) => q.id);
   const optionRecords = questionIds.length
     ? await safe(
-        () =>
-          db
-            .select()
-            .from(pollOptions)
-            .where(inArray(pollOptions.questionId, questionIds)),
-        [] as typeof pollOptions.$inferSelect[],
-      )
+      () =>
+        db
+          .select()
+          .from(pollOptions)
+          .where(inArray(pollOptions.questionId, questionIds)),
+      [] as typeof pollOptions.$inferSelect[],
+    )
     : [];
 
   const optionsByQuestion = optionRecords.reduce<

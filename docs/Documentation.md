@@ -33,7 +33,7 @@ I previously experimented with AI summaries and additional SSE helpers, but I re
 
 ## Repository Layout
 
-```
+```.
 app/
   (home)/page.tsx                 # Landing page + visitor counter
   dashboard/page.tsx              # Owner overview
@@ -109,15 +109,15 @@ When I touch the schema I run `pnpm db:generate` to emit migrations and `pnpm db
 
 ## Environment Variables I Care About
 
-| Variable                        | What I use it for                                              |
-| ------------------------------- | -------------------------------------------------------------- |
-| `DATABASE_URL`                  | Neon/Postgres connection string                                |
-| `NEXTAUTH_URL`                  | Base URL for NextAuth callbacks                                |
-| `NEXTAUTH_SECRET`               | Session/JWT secret; also salts device/email hashes             |
-| `RESEND_API_KEY` & `EMAIL_FROM` | Enable invite notifications after I commit a poll              |
-| `APP_URL`                       | Public URL inserted into emails                                |
-| `NEXT_PUBLIC_APP_URL`           | Optional client-side reference for share URLs                  |
-| `METRICS_SECRET`                | Optional salt override for visitor hashing                     |
+| Variable                        | What I use it for                                  |
+| ------------------------------- | -------------------------------------------------- |
+| `DATABASE_URL`                  | Neon/Postgres connection string                    |
+| `NEXTAUTH_URL`                  | Base URL for NextAuth callbacks                    |
+| `NEXTAUTH_SECRET`               | Session/JWT secret; also salts device/email hashes |
+| `RESEND_API_KEY` & `EMAIL_FROM` | Enable invite notifications after I commit a poll  |
+| `APP_URL`                       | Public URL inserted into emails                    |
+| `NEXT_PUBLIC_APP_URL`           | Optional client-side reference for share URLs      |
+| `METRICS_SECRET`                | Optional salt override for visitor hashing         |
 
 If Resend variables are missing, I log a warning and skip emails rather than fail the commit flow.
 

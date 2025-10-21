@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
-
 import VisitorCounter from "@/components/visitor-counter";
 import { auth } from "@/lib/auth";
 import { buttonPrimaryTall, card, subCard } from "@/lib/styles";
@@ -77,14 +76,10 @@ const capabilities = [
 export default async function HomePage() {
   const session = await auth();
   const isAuthenticated = Boolean(session?.user);
-
   const cookieStore = await cookies();
   const visitorCookieName = getVisitorCookieName();
   const visitorToken = cookieStore.get(visitorCookieName)?.value ?? null;
-
-  const visitorCount = visitorToken
-    ? await registerVisitor(visitorToken)
-    : await getVisitorTotal();
+  const visitorCount = visitorToken ? await registerVisitor(visitorToken) : await getVisitorTotal();
   const visitorCountLabel = new Intl.NumberFormat().format(visitorCount);
   const needsVisitorRegistration = !visitorToken;
 

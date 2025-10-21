@@ -29,8 +29,7 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
 
-export const accounts = pgTable(
-  "accounts",
+export const accounts = pgTable("accounts",
   {
     userId: text("user_id")
       .notNull()
@@ -51,16 +50,16 @@ export const accounts = pgTable(
   }),
 );
 
-export const sessions = pgTable("sessions", {
-  sessionToken: varchar("session_token", { length: 255 }).primaryKey(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  expires: timestamp("expires", { withTimezone: true }).notNull(),
-});
+export const sessions = pgTable("sessions",
+  {
+    sessionToken: varchar("session_token", { length: 255 }).primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    expires: timestamp("expires", { withTimezone: true }).notNull(),
+  });
 
-export const verificationTokens = pgTable(
-  "verification_tokens",
+export const verificationTokens = pgTable("verification_tokens",
   {
     identifier: varchar("identifier", { length: 255 }).notNull(),
     token: varchar("token", { length: 255 }).notNull(),
@@ -71,8 +70,7 @@ export const verificationTokens = pgTable(
   }),
 );
 
-export const authenticators = pgTable(
-  "authenticators",
+export const authenticators = pgTable("authenticators",
   {
     credentialID: varchar("credential_id", { length: 255 }).notNull().unique(),
     userId: text("user_id")
@@ -90,63 +88,66 @@ export const authenticators = pgTable(
   }),
 );
 
-export const polls = pgTable("polls", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  ownerId: text("owner_id")
-    .notNull()
-    .references(() => users.id),
-  title: varchar("title", { length: 200 }).notNull(),
-  description: varchar("description", { length: 2000 }),
-  visibility: visibilityEnum("visibility").notNull().default("public"),
-  identityMode: identityEnum("identity_mode").notNull().default("anonymous"),
-  multiQuestion: boolean("multi_question").notNull().default(true),
-  opensAt: timestamp("opens_at", { withTimezone: true }),
-  closesAt: timestamp("closes_at", { withTimezone: true }),
-  committedAt: timestamp("committed_at", { withTimezone: true }),
-  definitionHash: varchar("definition_hash", { length: 128 }),
-  version: integer("version").notNull().default(1),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
-});
+export const polls = pgTable("polls",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    ownerId: text("owner_id")
+      .notNull()
+      .references(() => users.id),
+    title: varchar("title", { length: 200 }).notNull(),
+    description: varchar("description", { length: 2000 }),
+    visibility: visibilityEnum("visibility").notNull().default("public"),
+    identityMode: identityEnum("identity_mode").notNull().default("anonymous"),
+    multiQuestion: boolean("multi_question").notNull().default(true),
+    opensAt: timestamp("opens_at", { withTimezone: true }),
+    closesAt: timestamp("closes_at", { withTimezone: true }),
+    committedAt: timestamp("committed_at", { withTimezone: true }),
+    definitionHash: varchar("definition_hash", { length: 128 }),
+    version: integer("version").notNull().default(1),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  });
 
-export const questions = pgTable("questions", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  pollId: text("poll_id")
-    .notNull()
-    .references(() => polls.id, { onDelete: "cascade" }),
-  kind: qKindEnum("kind").notNull(),
-  prompt: varchar("prompt", { length: 2000 }).notNull(),
-  orderIndex: integer("order_index").notNull(),
-  settings: jsonb("settings"),
-});
+export const questions = pgTable("questions",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    pollId: text("poll_id")
+      .notNull()
+      .references(() => polls.id, { onDelete: "cascade" }),
+    kind: qKindEnum("kind").notNull(),
+    prompt: varchar("prompt", { length: 2000 }).notNull(),
+    orderIndex: integer("order_index").notNull(),
+    settings: jsonb("settings"),
+  });
 
-export const options = pgTable("options", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  questionId: text("question_id")
-    .notNull()
-    .references(() => questions.id, { onDelete: "cascade" }),
-  label: varchar("label", { length: 2000 }).notNull(),
-  orderIndex: integer("order_index").notNull(),
-});
+export const options = pgTable("options",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    questionId: text("question_id")
+      .notNull()
+      .references(() => questions.id, { onDelete: "cascade" }),
+    label: varchar("label", { length: 2000 }).notNull(),
+    orderIndex: integer("order_index").notNull(),
+  });
 
-export const eligibilityLists = pgTable("eligibility_lists", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  pollId: text("poll_id")
-    .notNull()
-    .references(() => polls.id, { onDelete: "cascade" }),
-  name: varchar("name", { length: 200 }).notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
-});
+export const eligibilityLists = pgTable("eligibility_lists",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    pollId: text("poll_id")
+      .notNull()
+      .references(() => polls.id, { onDelete: "cascade" }),
+    name: varchar("name", { length: 200 }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  });
 
-export const eligibilityItems = pgTable(
-  "eligibility_list_items",
+export const eligibilityItems = pgTable("eligibility_list_items",
   {
     id: text("id")
       .primaryKey()
@@ -166,41 +167,42 @@ export const eligibilityItems = pgTable(
   }),
 );
 
-export const ballots = pgTable("ballots", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  pollId: text("poll_id")
-    .notNull()
-    .references(() => polls.id, { onDelete: "cascade" }),
-  voterRef: varchar("voter_ref", { length: 255 }),
-  anonymous: boolean("anonymous").notNull().default(true),
-  submittedAt: timestamp("submitted_at", { withTimezone: true }),
-  originIpHash: varchar("origin_ip_hash", { length: 128 }),
-  deviceTokenHash: varchar("device_token_hash", { length: 128 }),
-  userAgentHash: varchar("user_agent_hash", { length: 128 }),
-});
+export const ballots = pgTable("ballots",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    pollId: text("poll_id")
+      .notNull()
+      .references(() => polls.id, { onDelete: "cascade" }),
+    voterRef: varchar("voter_ref", { length: 255 }),
+    anonymous: boolean("anonymous").notNull().default(true),
+    submittedAt: timestamp("submitted_at", { withTimezone: true }),
+    originIpHash: varchar("origin_ip_hash", { length: 128 }),
+    deviceTokenHash: varchar("device_token_hash", { length: 128 }),
+    userAgentHash: varchar("user_agent_hash", { length: 128 }),
+  });
 
-export const votes = pgTable("votes", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  ballotId: text("ballot_id")
-    .notNull()
-    .references(() => ballots.id, { onDelete: "cascade" }),
-  pollId: text("poll_id")
-    .notNull()
-    .references(() => polls.id, { onDelete: "cascade" }),
-  questionId: text("question_id")
-    .notNull()
-    .references(() => questions.id),
-  optionId: text("option_id"),
-  freeText: varchar("free_text", { length: 4000 }),
-  weight: integer("weight").notNull().default(1),
-});
+export const votes = pgTable("votes",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    ballotId: text("ballot_id")
+      .notNull()
+      .references(() => ballots.id, { onDelete: "cascade" }),
+    pollId: text("poll_id")
+      .notNull()
+      .references(() => polls.id, { onDelete: "cascade" }),
+    questionId: text("question_id")
+      .notNull()
+      .references(() => questions.id),
+    optionId: text("option_id"),
+    freeText: varchar("free_text", { length: 4000 }),
+    weight: integer("weight").notNull().default(1),
+  });
 
-export const voteAggregates = pgTable(
-  "vote_aggregates",
+export const voteAggregates = pgTable("vote_aggregates",
   {
     pollId: text("poll_id")
       .notNull()
@@ -215,36 +217,37 @@ export const voteAggregates = pgTable(
   }),
 );
 
-export const shareLinks = pgTable("share_links", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  pollId: text("poll_id")
-    .notNull()
-    .references(() => polls.id, { onDelete: "cascade" }),
-  scope: shareScope("scope").notNull(),
-  visibility: visibilityEnum("visibility").notNull(),
-  tokenHash: varchar("token_hash", { length: 128 }).notNull(),
-  expiresAt: timestamp("expires_at", { withTimezone: true }),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
-});
+export const shareLinks = pgTable("share_links",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    pollId: text("poll_id")
+      .notNull()
+      .references(() => polls.id, { onDelete: "cascade" }),
+    scope: shareScope("scope").notNull(),
+    visibility: visibilityEnum("visibility").notNull(),
+    tokenHash: varchar("token_hash", { length: 128 }).notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  });
 
-export const auditLogs = pgTable("audit_logs", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  ts: timestamp("ts", { withTimezone: true }).defaultNow(),
-  actorType: actorEnum("actor_type").notNull(),
-  actorId: varchar("actor_id", { length: 255 }),
-  action: varchar("action", { length: 120 }).notNull(),
-  entity: varchar("entity", { length: 120 }).notNull(),
-  entityId: varchar("entity_id", { length: 120 }).notNull(),
-  prevHash: varchar("prev_hash", { length: 128 }),
-  hash: varchar("hash", { length: 128 }).notNull(),
-});
+export const auditLogs = pgTable("audit_logs",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    ts: timestamp("ts", { withTimezone: true }).defaultNow(),
+    actorType: actorEnum("actor_type").notNull(),
+    actorId: varchar("actor_id", { length: 255 }),
+    action: varchar("action", { length: 120 }).notNull(),
+    entity: varchar("entity", { length: 120 }).notNull(),
+    entityId: varchar("entity_id", { length: 120 }).notNull(),
+    prevHash: varchar("prev_hash", { length: 128 }),
+    hash: varchar("hash", { length: 128 }).notNull(),
+  });
 
-export const passwordCredentials = pgTable(
-  "password_credentials",
+export const passwordCredentials = pgTable("password_credentials",
   {
     id: text("id")
       .primaryKey()
@@ -265,13 +268,15 @@ export const passwordCredentials = pgTable(
   }),
 );
 
-export const appMetrics = pgTable("app_metrics", {
-  key: text("key").primaryKey(),
-  value: bigint("value", { mode: "number" }).notNull().default(0),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
-});
+export const appMetrics = pgTable("app_metrics",
+  {
+    key: text("key").primaryKey(),
+    value: bigint("value", { mode: "number" }).notNull().default(0),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+  });
 
-export const visitorTokens = pgTable("visitor_tokens", {
-  tokenHash: text("token_hash").primaryKey(),
-  firstSeen: timestamp("first_seen", { withTimezone: true }).defaultNow(),
-});
+export const visitorTokens = pgTable("visitor_tokens",
+  {
+    tokenHash: text("token_hash").primaryKey(),
+    firstSeen: timestamp("first_seen", { withTimezone: true }).defaultNow(),
+  });

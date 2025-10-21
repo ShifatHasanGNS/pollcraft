@@ -1,7 +1,6 @@
 export type PollEvent = { type: "votes:updated" };
 
 type Listener = (event: PollEvent) => void;
-
 type Registry = Map<string, Set<Listener>>;
 
 const globalKey = Symbol.for("pollcraft.realtime");
