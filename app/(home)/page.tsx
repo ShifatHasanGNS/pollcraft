@@ -76,25 +76,8 @@ const capabilities = [
 export default async function HomePage() {
   const session = await auth();
   const isAuthenticated = Boolean(session?.user);
-  const cookieStore = await cookies();
-  const visitorCookieName = getVisitorCookieName();
-  let visitorToken = cookieStore.get(visitorCookieName)?.value ?? null;
 
-  if (!visitorToken) {
-    visitorToken = generateVisitorToken();
-    cookieStore.set({
-      name: visitorCookieName,
-      value: visitorToken,
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 365,
-    });
-  }
-
-  const visitorCount = await registerVisitor(visitorToken);
-  const visitorCountLabel = new Intl.NumberFormat().format(visitorCount);
+  const { visitorCountLabel } = await getOrRegisterVisitor();
 
   return (
     <main className="relative isolate overflow-hidden bg-background text-foreground">
@@ -188,4 +171,31 @@ export default async function HomePage() {
       </footer>
     </main>
   );
+}
+
+async function getOrRegisterVisitor() {
+  "use server";
+
+  const cookieStore = await cookies();
+  const visitorCookieName = getVisitorCookieName();
+  let visitorToken = cookieStore.get(visitorCookieName)?.value ?? null;
+
+  if (!visitorToken) {
+    visitorToken = generateVisitorToken();
+    cookieStore.set({
+      name: visitorCookieName,
+      value: visitorToken,
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365,
+    });
+  }
+
+  const visitorCount = await registerVisitor(visitorToken);
+
+  return {
+    visitorCountLabel: new Intl.NumberFormat().format(visitorCount),
+  };
 }
