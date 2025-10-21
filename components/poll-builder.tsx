@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import clsx from "clsx";
@@ -46,7 +46,7 @@ export function PollBuilder({ className }: PollBuilderProps) {
   const {
     register,
     handleSubmit,
-    watch,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<PollFormValues>({
     resolver: zodResolver(PollSchema),
@@ -55,7 +55,10 @@ export function PollBuilder({ className }: PollBuilderProps) {
       identityMode: "anonymous",
     },
   });
-  const visibility = watch("visibility");
+  const visibility = useWatch({
+    control,
+    name: "visibility",
+  });
 
   const [questions, setQuestions] = useState<DraftQuestion[]>([createEmptyQuestion()]);
   const [error, setError] = useState<string | null>(null);

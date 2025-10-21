@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { eq, inArray } from "drizzle-orm";
 
 import { db } from "@/lib/db";
@@ -20,6 +21,9 @@ export default async function PollVotePage({
   searchParams,
 }: PollVotePageProps) {
   const [{ pollId }, { token }] = await Promise.all([params, searchParams]);
+  const requestHeaders = await headers();
+  const requestDateHeader = requestHeaders.get("date");
+  const nowTimestamp = requestDateHeader ? Date.parse(requestDateHeader) : null;
 
   const safe = async <T,>(operation: () => Promise<T>, fallback: T): Promise<T> => {
     try {
@@ -45,9 +49,12 @@ export default async function PollVotePage({
     redirect("/");
   }
 
-  const now = Date.now();
-  const notYetOpen = poll.opensAt && now < new Date(poll.opensAt).getTime();
-  const alreadyClosed = poll.closesAt && now > new Date(poll.closesAt).getTime();
+  const opensAtMs = poll.opensAt ? new Date(poll.opensAt).getTime() : null;
+  const closesAtMs = poll.closesAt ? new Date(poll.closesAt).getTime() : null;
+  const notYetOpen =
+    opensAtMs !== null && nowTimestamp !== null ? opensAtMs > nowTimestamp : false;
+  const alreadyClosed =
+    closesAtMs !== null && nowTimestamp !== null ? closesAtMs < nowTimestamp : false;
 
   const questionRecords = await safe(
     () =>
