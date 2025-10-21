@@ -68,7 +68,9 @@ export function PollStatisticsClient({ pollId, initial }: PollStatisticsClientPr
     const labels = options.map((option) => option.label);
     const counts = options.map((option) => option.count);
     const participants = options[0]?.participants ?? 0;
-    const maxValue = Math.max(participants, ...counts, 1);
+    const baseMax = Math.max(participants, ...counts, 1);
+    // Add headroom so full-width bars (100%) leave space for labels.
+    const paddedMax = Math.max(1, Math.ceil(baseMax * 1.08));
 
     const chartOption = {
       tooltip: {
@@ -81,10 +83,10 @@ export function PollStatisticsClient({ pollId, initial }: PollStatisticsClientPr
           return `${labels[params.dataIndex]}<br/>${count} of ${total} (${percentage.toFixed(1)}%)`;
         },
       },
-      grid: { left: 84, right: 32, bottom: 36, top: 16, containLabel: true },
+      grid: { left: 84, right: 56, bottom: 36, top: 16, containLabel: true },
       xAxis: {
         type: "value",
-        max: maxValue,
+        max: paddedMax,
         axisLabel: {
           formatter(value: number) {
             return value.toString();
@@ -107,6 +109,7 @@ export function PollStatisticsClient({ pollId, initial }: PollStatisticsClientPr
           label: {
             show: true,
             position: "right",
+            distance: 12,
             formatter: (params: { dataIndex: number }) => {
               const option = options[params.dataIndex] ?? null;
               if (!option) return "";
