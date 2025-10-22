@@ -21,7 +21,7 @@ import {
 export default async function PollDetailsPage({ params }: { params: Promise<{ pollId: string }> }) {
   const { pollId } = await params;
   const session = await auth();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     redirect("/login");
   }
 

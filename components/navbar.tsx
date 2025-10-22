@@ -16,7 +16,7 @@ export function Navbar({ initialSession }: NavbarProps) {
   const { data } = useSession();
   const pathname = usePathname();
   const session = data ?? initialSession;
-  const isAuthenticated = Boolean(session?.user);
+  const isAuthenticated = Boolean(session?.user?.id);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const navLinks = [

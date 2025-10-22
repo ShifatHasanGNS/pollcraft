@@ -127,11 +127,24 @@ export function PollBuilder({ className }: PollBuilderProps) {
 
     const trimmedEmails =
       values.visibility === "listed"
-        ? (values.listedEmails ?? "")
-          .split(",")
-          .map((email) => email.trim().toLowerCase())
-          .filter((email) => email.length > 0)
+        ? Array.from(
+          new Set(
+            (values.listedEmails ?? "")
+              .split(/[\n,]+/)
+              .map((email) => email.trim().toLowerCase())
+              .filter((email) => email.length > 0),
+          ),
+        )
         : [];
+
+    if (values.visibility === "listed") {
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const invalidEmail = trimmedEmails.find((email) => !emailPattern.test(email));
+      if (invalidEmail) {
+        setError(`"${invalidEmail}" is not a valid email. Separate addresses with commas or new lines.`);
+        return;
+      }
+    }
 
     const payload = {
       title: values.title,

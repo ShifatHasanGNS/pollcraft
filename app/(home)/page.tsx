@@ -75,7 +75,7 @@ const capabilities = [
 
 export default async function HomePage() {
   const session = await auth();
-  const isAuthenticated = Boolean(session?.user);
+  const isAuthenticated = Boolean(session?.user?.id);
   const cookieStore = await cookies();
   const visitorCookieName = getVisitorCookieName();
   const visitorToken = cookieStore.get(visitorCookieName)?.value ?? null;

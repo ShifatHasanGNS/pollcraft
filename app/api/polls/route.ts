@@ -1,7 +1,7 @@
 import { randomUUID, createHash } from "node:crypto";
 import { NextResponse } from "next/server";
 import { pruneExpiredPolls } from "@/lib/poll-maintenance";
-import { z } from "zod";
+import { z, ZodError } from "zod";
 import { desc, eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -68,7 +68,28 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = PollBody.parse(await request.json());
+  let parsedBody: z.infer<typeof PollBody>;
+  try {
+    parsedBody = PollBody.parse(await request.json());
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return NextResponse.json(
+        {
+          error: "Invalid poll details. Check required fields and email formatting.",
+          issues: error.issues,
+        },
+        { status: 400 },
+      );
+    }
+    throw error;
+  }
+
+  const body = {
+    ...parsedBody,
+    listedEmails: parsedBody.listedEmails
+      ? Array.from(new Set(parsedBody.listedEmails.map((email) => email.trim().toLowerCase())))
+      : undefined,
+  };
 
   const pollId = randomUUID();
   const now = new Date();

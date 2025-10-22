@@ -10,7 +10,7 @@ import { polls } from "@/drizzle/schema";
 
 export default async function DashboardPage() {
   const session = await auth();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     redirect("/login");
   }
   const ownerId = session.user.id;
