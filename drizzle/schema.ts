@@ -15,8 +15,6 @@ import {
 export const visibilityEnum = pgEnum("visibility", ["public", "listed"]);
 export const identityEnum = pgEnum("identity_mode", ["anonymous", "identified"]);
 export const qKindEnum = pgEnum("question_kind", ["single", "multi", "ranked", "text"]);
-export const actorEnum = pgEnum("actor_type", ["system", "user", "voter"]);
-export const shareScope = pgEnum("share_scope", ["results", "report"]);
 
 export const users = pgTable("users", {
   id: text("id")
@@ -217,35 +215,6 @@ export const voteAggregates = pgTable("vote_aggregates",
   }),
 );
 
-export const shareLinks = pgTable("share_links",
-  {
-    id: text("id")
-      .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
-    pollId: text("poll_id")
-      .notNull()
-      .references(() => polls.id, { onDelete: "cascade" }),
-    scope: shareScope("scope").notNull(),
-    visibility: visibilityEnum("visibility").notNull(),
-    tokenHash: varchar("token_hash", { length: 128 }).notNull(),
-    expiresAt: timestamp("expires_at", { withTimezone: true }),
-    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
-  });
-
-export const auditLogs = pgTable("audit_logs",
-  {
-    id: text("id")
-      .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
-    ts: timestamp("ts", { withTimezone: true }).defaultNow(),
-    actorType: actorEnum("actor_type").notNull(),
-    actorId: varchar("actor_id", { length: 255 }),
-    action: varchar("action", { length: 120 }).notNull(),
-    entity: varchar("entity", { length: 120 }).notNull(),
-    entityId: varchar("entity_id", { length: 120 }).notNull(),
-    prevHash: varchar("prev_hash", { length: 128 }),
-    hash: varchar("hash", { length: 128 }).notNull(),
-  });
 
 export const passwordCredentials = pgTable("password_credentials",
   {
